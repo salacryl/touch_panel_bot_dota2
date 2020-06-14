@@ -19,14 +19,17 @@
   },
   "homepage": "https://github.com/salacryl/base_nodejs_bootstrap#readme",
   "dependencies": {
+    "@node-steam/id": "^1.1.0",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "browser-sync": "^2.26.7",
+    "dota2": "^7.0.3",
     "express": "^4.17.1",
     "express-handlebars": "^3.1.0",
     "jsdoc": "^3.6.3",
     "method-override": "^3.0.0",
     "nodemon": "^2.0.2",
+    "steam": "^1.4.1",
     "winston": "^3.2.1"
   },
   "devDependencies": {
