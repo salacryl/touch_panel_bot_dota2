@@ -41,46 +41,23 @@ app.use(methodOverride("_method"));
 // publish public folder
 app.use(express.static(path.join(__dirname, "/public")));
 
-// default route 
-app.get("/", (req, res) => {
-	res.render("homepage", {greeting: "Salacryl's starting project",});
-});
-
-app.listen(PORT, () => logger.log("info", "Webservice startet on Port: %d", PORT));
-
-/** Test doku automation
- * @returns {int} 0 
-*/
-const testIt = () => 0;
-testIt();
-
-// init browser-sync
-logger.log("info", "ENV ist: %s", ENV);
-if (ENV==="dev"){
-	const bs = browserSync.create();
-	bs.init({
-		port: PORT+1,
-		proxy: {
-			target: "localhost:" + PORT,
-		},
-	});
-}
 
 
 let dotaClient = new Dota(process.env.STEAM_USERNAME, process.env.STEAM_PASSWORD)
-module.exports.dotaClient = dotaClient
 
 
 
 const intervalGetGamesAndRps = () => {
-    return dotaClient.requestRichPresence([...accounts]).then(rps => {
+    return dotaClient.requestRichPresence([76561197970321427]).then(rps => {
         let lobby_ids = new Set()
         let now = new Date()
-        if (!rps.length) return
-        rps.forEach(rp => rp.createdAt = now)
-        mongoDb.collection('rps').insertMany(rps)
+		console.log(rps);
+		if (!rps.length) return
+		rps.forEach(rp => rp.createdAt = now)
+		
         rps.filter(rp => rp.WatchableGameID).forEach(rp => lobby_ids.add(rp.WatchableGameID))
-        return dotaClient.requestSourceTVGames({ start_game: 90, lobby_ids: [...lobby_ids] }).then(matches => {
+		
+		return dotaClient.requestSourceTVGames({ start_game: 90, lobby_ids: [...lobby_ids] }).then(matches => {
             let now = new Date()
             matches = matches.map(match => {
                 let item = {
@@ -101,7 +78,8 @@ const intervalGetGamesAndRps = () => {
                         account_id: player.account_id,
                         hero_id: player.hero_id
                     }))
-                }
+				}
+				console.log(item);
                 return item
             })
             return 
@@ -112,9 +90,25 @@ const intervalGetGamesAndRps = () => {
 
 
 let getGamesAndRpsInterval;
-getGamesAndRpsInterval = setInterval(intervalGetGamesAndRps, 30000)
+getGamesAndRpsInterval = setInterval(intervalGetGamesAndRps, 10000)
 process.on('SIGTERM', () => {
 	clearInterval(getGamesAndRpsInterval)
 	dotaClient.exit()
 	process.exit(0)
 })
+// default route 
+
+
+app.listen(PORT, () => logger.log("info", "Webservice startet on Port: %d", PORT));
+
+// init browser-sync
+logger.log("info", "ENV ist: %s", ENV);
+if (ENV==="dev"){
+	const bs = browserSync.create();
+	bs.init({
+		port: PORT+1,
+		proxy: {
+			target: "localhost:" + PORT,
+		},
+	});
+}
