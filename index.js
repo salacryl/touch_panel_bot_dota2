@@ -48,23 +48,24 @@ let dotaClient = new Dota(process.env.STEAM_USERNAME, process.env.STEAM_PASSWORD
 
 
 const intervalGetGamesAndRps = () => {
-    return dotaClient.requestRichPresence([76561197970321427]).then(rps => {
+    return dotaClient.requestRichPresence(["76561197970321427"]).then(rps => {
         let lobby_ids = new Set()
         let now = new Date()
-		console.log(rps);
 		if (!rps.length) return
 		rps.forEach(rp => rp.createdAt = now)
 		
         rps.filter(rp => rp.WatchableGameID).forEach(rp => lobby_ids.add(rp.WatchableGameID))
-		
+        
+        
 		return dotaClient.requestSourceTVGames({ start_game: 90, lobby_ids: [...lobby_ids] }).then(matches => {
             let now = new Date()
+            
             matches = matches.map(match => {
                 let item = {
                     average_mmr: match.average_mmr,
                     game_mode: match.game_mode,
                     league_id: match.league_id,
-                    match_id: match.match_id.toString(),
+                    //match_id: match.match_id.toString(),
                     lobby_id: match.lobby_id,
                     lobby_type: match.lobby_type,
                     players: match.players,
@@ -79,12 +80,12 @@ const intervalGetGamesAndRps = () => {
                         hero_id: player.hero_id
                     }))
 				}
-				console.log(item);
+				console.log(match);
                 return item
             })
             return 
      
-    }).catch(() => { })
+    }).catch((err) => { console.log(err)})
 })
 }
 
